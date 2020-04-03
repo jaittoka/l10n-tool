@@ -12,6 +12,14 @@
     "watch": "tsc -w ./src",
     "clean": "rm -rf lib"
   },
+  "keywords": [
+    "locale",
+    "localization",
+    "internationalization",
+    "l10n",
+    "i18n",
+    "typescript"
+  ],
   "license": "MIT",
   "repository": "https://github.com/jaittoka/l10n-tool",
   "author": "Jukka Aittokallio <jukka@aittokallio.com>",
