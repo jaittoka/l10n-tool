@@ -6,6 +6,12 @@
   "bin": {
     "l10n-tool": "./bin/l10n-tool"
   },
+  "scripts": {
+    "prepublishOnly": "npm run compile",
+    "compile": "npm run clean && tsc",
+    "watch": "tsc -w ./src",
+    "clean": "rm -rf lib"
+  },
   "license": "MIT",
   "repository": "https://github.com/jaittoka/l10n-tool",
   "author": "Jukka Aittokallio <jukka@aittokallio.com>",
