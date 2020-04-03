@@ -1,6 +1,6 @@
 {
   "name": "l10n-tool",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Tool for generating localization for a javascript/typescript project",
   "main": "lib/index.js",
   "bin": {
@@ -28,5 +28,13 @@
   },
   "devDependencies": {
     "@types/node": "^13.11.0"
-  }
+  },
+  "files": [
+    "lib/compileLocale.js",
+    "lib/findFiles.js",
+    "lib/index.js",
+    "lib/main.js",
+    "lib/parseLocaleFile.js"
+  ]
+
 }
