@@ -11,14 +11,11 @@ or
 
 `yarn add l10n-tool`
 
-Command line Usage
+Command line Usage (if globally installed)
 =====
 
-`npm run l10n-tool <source dir> <target dir>`
+`l10n-tool <source dir> <target dir>`
 
-or
-
-`yarn l10n-tool <source dir> <target dir>`
 
 Source directory is the root directory under which the tool scans for every localization file (by default named by `*.l10n.json`).
 
