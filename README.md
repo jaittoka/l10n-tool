@@ -93,8 +93,8 @@ console.log(fi.common.msgCount(3)); // => Sinulla on 3 viestiä.
 
 Command Line Options
 =======
-* `-p` prefix for generated localization files (default `locale_`)
-* `-r` regexp for determining whether file is a localization JSON-file (default `/\.l10n\.json$/`)
+* `-p prefix` prefix for generated localization files (default `locale_`)
+* `-r regex` regexp for determining whether file is a localization JSON-file (default `/\.l10n\.json$/`)
 * `-j` generate javascript (default is typescript)
 
 Programmatic use
