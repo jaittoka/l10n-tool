@@ -1,0 +1,18 @@
+{
+  "name": "l10n-tool",
+  "version": "1.0.1",
+  "description": "Tool for generating localization for a javascript/typescript project",
+  "main": "lib/index.js",
+  "bin": {
+    "l10n-tool": "./bin/l10n-tool"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/jaittoka/l10n-tool",
+  "author": "Jukka Aittokallio <jukka@aittokallio.com>",
+  "dependencies": {
+    "typed-decoders": "^2.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^13.11.0"
+  }
+}
