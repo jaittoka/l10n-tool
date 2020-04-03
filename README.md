@@ -1,7 +1,7 @@
 Overview
 ========
 
-l10n-tool is used to create typescript/javascript locale files from localizaion JSON-files under your project source.
+l10n-tool is used to create typescript/javascript locale files from localization JSON-files under your project source. It goes through every locale JSON file and combines them to a single file per language.
 
 Installation
 ============
