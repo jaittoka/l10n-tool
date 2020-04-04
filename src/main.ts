@@ -1,10 +1,5 @@
 import processLocales, { Opts } from "./index";
 
-function makeRegexMatcher(re: string) {
-  const regexp = new RegExp(re);
-  return (path: string) => regexp.test(path);
-}
-
 function parseArguments() {
   const opts: Partial<Opts> = {};
   const args = process.argv.slice(2);
@@ -26,11 +21,6 @@ function parseArguments() {
         break;
       case "-p":
         opts.prefix = checkOpt(args[++i], "-p option needs a prefix string");
-        break;
-      case "-r":
-        opts.isLocaleFile = makeRegexMatcher(
-          checkOpt(args[++i], "-r option needs a regular expression.")
-        );
         break;
       case '-c':
         opts.comments = true;

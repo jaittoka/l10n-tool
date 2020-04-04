@@ -1,22 +1,29 @@
 import { promises as fs } from "fs";
 import { join } from "path";
-import findFiles from "./findFiles";
+import findFiles, { ClassifyFile, LanguageFile } from "./findFiles";
 import parseFile, { Localizations } from "./parseLocaleFile";
 import compileLocale from "./compileLocale";
 
-function isLocaleFile(path: string): boolean {
-  return /\.l10n\.json$/.test(path);
+function classifyFile(path: string): string | undefined {
+  if (/\.l10n\.json$/.test(path)) {
+    return '*';
+  }
+  const re = /\.(\w+)\.json$/ 
+  const m = re.exec(path);
+  if (m) {
+    return m[1];
+  }
 }
 
-async function readAndParseFile(path: string, localizations: Localizations) {
-  return parseFile(path, await fs.readFile(path, "utf8"), localizations);
+async function readAndParseFile(file: LanguageFile, localizations: Localizations) {
+  return parseFile(file.path, file.language, await fs.readFile(file.path, "utf8"), localizations);
 }
 
 async function findLocaleStrings(
-  pred: (path: string) => boolean,
+  classifyFile: ClassifyFile,
   path: string
 ) {
-  const list = await findFiles(pred, path);
+  const list = await findFiles(classifyFile, path);
   const localizations = {} as Localizations;
   await Promise.all(list.map(path => readAndParseFile(path, localizations)));
   return localizations;
@@ -25,7 +32,7 @@ async function findLocaleStrings(
 export interface Opts {
   srcDir: string;
   destDir: string;
-  isLocaleFile: (path: string) => boolean; // default: ends with .l10n.json
+  classifyFile: ClassifyFile;
   prefix: string; // default "locale_"
   comments: boolean;
   ts: boolean; // default true
@@ -34,8 +41,8 @@ export interface Opts {
 const defaultOpts: Opts = {
   srcDir: ".",
   destDir: "./locale",
-  isLocaleFile,
   prefix: "locale_",
+  classifyFile,
   comments: false,
   ts: true
 };
@@ -44,7 +51,7 @@ export default async function(options?: Partial<Opts>) {
   const opts = { ...defaultOpts, ...options };
   const ext = opts.ts ? ".ts" : ".js";
 
-  const locales = await findLocaleStrings(opts.isLocaleFile, opts.srcDir);
+  const locales = await findLocaleStrings(opts.classifyFile, opts.srcDir);
   const languages = Object.keys(locales);
   if (languages.length === 0) return [];
 

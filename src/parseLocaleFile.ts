@@ -48,7 +48,7 @@ function getFiles(node: Node): string[] {
     if (isLeaf(node)) {
       result.push(node.filePath);
     } else {
-      Object.keys(node.children).forEach(key => enter(node.children[key]));
+      Object.keys(node.children).forEach((key) => enter(node.children[key]));
     }
   }
   enter(node);
@@ -87,15 +87,15 @@ function merge(tree: Tree, path: string[], filePath: string, value: string) {
   children[key] = { filePath, value };
 }
 
-function readLocaleData(
+function readMultiLocaleData(
   path: string,
-  data: KeyFile,
+  data: any,
   localizations: Localizations
 ): void {
-  Object.keys(data).forEach(key => {
+  Object.keys(data).forEach((key) => {
     const parts = key.split(".");
     const localeValues = data[key];
-    Object.keys(localeValues).forEach(language => {
+    Object.keys(localeValues).forEach((language) => {
       let tree = localizations[language];
       if (!tree) {
         tree = { children: {} };
@@ -106,24 +106,25 @@ function readLocaleData(
   }, {});
 }
 
-function parseContents(
+function readSingleLocaleData(
   path: string,
-  json: object,
+  language: string,
+  data: any,
   localizations: Localizations
 ) {
-  const res = runDecoder(KeyFileDecoder, json);
-  if (isFailure(res)) {
-    throw new Error(
-      `Error decoding locale file ${j2s(path)}. Field ${j2s(res.path)}: ${
-        res.error
-      }`
-    );
+  let tree = localizations[language];
+  if (!tree) {
+    tree = { children: {} };
+    localizations[language] = tree;
   }
-  return readLocaleData(path, res.value, localizations);
+  Object.keys(data).forEach((key) => {
+    merge(tree, key.split("."), path, data[key]);
+  });
 }
 
-export default function(
+export default function (
   path: string,
+  language: string | undefined,
   content: string,
   localizations: Localizations
 ) {
@@ -133,5 +134,10 @@ export default function(
   } catch (err) {
     throw new Error(`Error parsing locale file ${path}: ${err.message}`);
   }
-  return parseContents(path, json, localizations);
+
+  if (language) {
+    return readSingleLocaleData(path, language, json, localizations);
+  } else {
+    return readMultiLocaleData(path, json, localizations);
+  }
 }
