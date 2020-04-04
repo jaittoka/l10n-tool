@@ -1,9 +1,3 @@
-import { Decoders as D, runDecoder, isFailure, GetType } from "typed-decoders";
-
-const KeyDecoder = D.Rec(D.Str);
-const KeyFileDecoder = D.Rec(KeyDecoder);
-type KeyFile = GetType<typeof KeyFileDecoder>;
-
 export interface Leaf {
   filePath: string;
   value: string;
