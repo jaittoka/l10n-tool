@@ -1,6 +1,6 @@
 {
   "name": "l10n-tool",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Tool for generating localization for a javascript/typescript project",
   "main": "lib/index.js",
   "bin": {

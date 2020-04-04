@@ -96,6 +96,7 @@ Command Line Options
 * `-p prefix` prefix for generated localization files (default `locale_`)
 * `-r regex` regexp for determining whether file is a localization JSON-file (default `/\.l10n\.json$/`)
 * `-j` generate javascript (default is typescript)
+* `-c` put comment after each localization string from which file the key originates
 
 Programmatic use
 ================

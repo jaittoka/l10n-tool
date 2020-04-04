@@ -1,44 +1,52 @@
-import { Node, Tree, isLeaf } from "./parseLocaleFile";
+import { Node, Tree, Leaf, isLeaf } from "./parseLocaleFile";
 
 const re = /\$\{(\w+)\}/g;
 
 const _indent = "  ";
 
-function compileValue(str: string, ts: boolean): string {
+function compileValue(leaf: Leaf, ctx: CompileOpts): string {
   const variables = [] as string[];
-  const rhs = str.replace(re, (_, name) => {
+  const rhs = leaf.value.replace(re, (_, name) => {
     variables.push(name);
     return "${i." + name + "}";
   });
+  const comment = ctx.comments ? ` /* ${leaf.filePath} */` : "";  
   if (variables.length > 0) {
-    const t = ts ? `: {${variables.map(n => `${n}: string`).join(", ")}}` : "";
-    return `(i${t}) => \`${rhs}\``;
+    const t = ctx.ts
+      ? `: {${variables.map(n => `${n}: string`).join(", ")}}`
+      : "";
+    return `(i${t}) => \`${rhs}\`${comment}`;
   } else {
-    return JSON.stringify(rhs);
+    return `${JSON.stringify(rhs)}${comment}`
   }
 }
 
 function compileField(
   node: Node,
   name: string,
-  ts: boolean,
+  ctx: CompileOpts,
   indent: string
 ): string {
-  return `${indent}${name}: ${compileNode(node, ts, indent)}`;
+  return `${indent}${name}: ${compileNode(node, ctx, indent)}`;
 }
 
-function compileTree(tree: Tree, ts: boolean, indent: string): string {
+function compileTree(tree: Tree, ctx: CompileOpts, indent: string): string {
   return `{\n${Object.keys(tree.children)
-    .map(n => compileField(tree.children[n], n, ts, indent + _indent))
+    .map(n => compileField(tree.children[n], n, ctx, indent + _indent))
     .join(",\n")}\n${indent}}`;
 }
 
-function compileNode(node: Node, ts: boolean, indent: string): string {
+function compileNode(node: Node, ctx: CompileOpts, indent: string): string {
   return isLeaf(node)
-    ? compileValue(node.value, ts)
-    : compileTree(node, ts, indent);
+    ? compileValue(node, ctx)
+    : compileTree(node, ctx, indent);
 }
 
-export default function compileLocale(locale: Tree, ts: boolean): string {
-  return `export default ${compileTree(locale, ts, "")}\n`;
+export interface CompileOpts {
+  ts: boolean;
+  comments: boolean;
+}
+
+export default function compileLocale(locale: Tree, ctx: CompileOpts): string {
+  return `export default ${compileTree(locale, ctx, "")}\n`;
 }

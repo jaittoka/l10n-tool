@@ -12,7 +12,10 @@ async function readAndParseFile(path: string, localizations: Localizations) {
   return parseFile(path, await fs.readFile(path, "utf8"), localizations);
 }
 
-async function findLocaleStrings(pred: (path: string) => boolean, path: string) {
+async function findLocaleStrings(
+  pred: (path: string) => boolean,
+  path: string
+) {
   const list = await findFiles(pred, path);
   const localizations = {} as Localizations;
   await Promise.all(list.map(path => readAndParseFile(path, localizations)));
@@ -24,30 +27,35 @@ export interface Opts {
   destDir: string;
   isLocaleFile: (path: string) => boolean; // default: ends with .l10n.json
   prefix: string; // default "locale_"
+  comments: boolean;
   ts: boolean; // default true
 }
 
 const defaultOpts: Opts = {
-  srcDir: '.',
-  destDir: './locale',
+  srcDir: ".",
+  destDir: "./locale",
   isLocaleFile,
-  prefix: 'locale_',
+  prefix: "locale_",
+  comments: false,
   ts: true
-}
+};
 
 export default async function(options?: Partial<Opts>) {
   const opts = { ...defaultOpts, ...options };
-  const ext = opts.ts ? '.ts' : '.js';
+  const ext = opts.ts ? ".ts" : ".js";
 
   const locales = await findLocaleStrings(opts.isLocaleFile, opts.srcDir);
   const languages = Object.keys(locales);
   if (languages.length === 0) return [];
 
   await fs.mkdir(opts.destDir, { recursive: true });
-  
+
   return Promise.all(
     languages.map(language => {
-      const tsContent = compileLocale(locales[language], opts.ts);
+      const tsContent = compileLocale(locales[language], {
+        ts: opts.ts,
+        comments: opts.comments
+      });
       const filename = join(opts.destDir, `${opts.prefix}${language}${ext}`);
       return fs.writeFile(filename, tsContent, "utf8");
     })

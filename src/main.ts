@@ -32,6 +32,9 @@ function parseArguments() {
           checkOpt(args[++i], "-r option needs a regular expression.")
         );
         break;
+      case '-c':
+        opts.comments = true;
+        break;
       default:
         params.push(args[i]);
         break;
