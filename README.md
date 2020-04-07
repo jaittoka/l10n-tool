@@ -16,70 +16,62 @@ or
 
 Source directory is the root directory under which the tool scans for every localization file
 
-Localization is either single language file (name is `*.<lang>.json`) or multi language file (name is `*.l10n.json`)
+Localization file is a JSON file that is named as `[module].<lang>[_<country>].l10n.json` and contains an object of localizations keys.
 
-Target directory is the directory where the tool generates the localization files. (by default named `locale_<lang>.[js, ts]`).
+Target directory is the directory where the tool generates the localization files. (by default named `<module>_<lang>_<country>.[js, ts]`).
 
-## Single-language file
+## Localization files example
 
+`en.l10n.json`
 ```json
 {
   "common.file.save": "Save",
   "common.file.cancel": "Cancel",
-  "msgCount": "You have ${count} messages."
 }
 ```
 
-## Multi-language file
-
-Example of multi language localization JSON-file structure:
-
+`en_GB.l10n.json`
 ```json
 {
-  "common.file.save": {
-    "en": "Save",
-    "fi": "Tallenna"
-  },
-  "common.file.cancel": {
-    "en": "Cancel",
-    "fi": "Peruuta"
-  },
-  "msgCount": {
-    "en": "You have ${count} messages.",
-    "fi": "Sinulla on ${count} viestiä."
-  }
+  "apartments": "You have ${count} flats."
 }
 ```
+
+`en_US.l10n.json`
+```json
+{
+  "apartments": "You have ${count} apartments."
+}
+```
+
 
 When you run the l10n-tool it will generate two files under the destination directory.
 
-One for English (en):
+One for British English (`en_GB.ts`):
+
+```typescript
+export default {
+  common: {
+    file: {
+      save: "Save" ,
+      cancel: "Cancel"
+    }
+  },
+  apartments: (i: {count: string}) => `You have ${i.count} flats.`
+};
+```
+
+and one for US English (`en_US.ts`):
 
 ```typescript
 export default {
   common: {
     file: {
       save: "Save",
-      cancel: "Cancel",
-    },
-    title: "Title",
+      cancel: "Cancel"
+    }
   },
-  msgCount: (i: { count: string }) => `You have ${i.count} messages.`,
-};
-```
-
-and one for Finnish (fi):
-
-```typescript
-export default {
-  common: {
-    file: {
-      save: "Tallenna",
-      cancel: "Peruuta",
-    },
-    title: "Otsikko",
-  },
-  msgCount: (i: { count: string }) => `Sinulla on ${i.count} viestiä.`,
+  apartments: (i: {count: string}) => `You have ${i.count} apartments.`
 };
 ```
 
@@ -94,16 +86,13 @@ If the localization string doesn't contain named paramaters, then the string goe
 You can then import these files from your project code and use the strings. The advantage of using localization strings this way is that you get code completion and type safety (type safety in typescript only). An example:
 
 ```typescript
-import fi from "../locale/locale_fi";
-import en from "../locale/locale_en";
+import en from "../locale/en_GB";
 
-console.log(en.common.msgCount(4)); // => You have 4 messages.
-console.log(fi.common.msgCount(3)); // => Sinulla on 3 viestiä.
+console.log(en.apartments(4)); // => You have 4 flats.
 ```
 
 # Command Line Options
 
-- `-p prefix` prefix for generated localization files (default `locale_`)
 - `-j` generate javascript (default is typescript)
 - `-c` put comment after each localization string from which file the key originates
 
@@ -116,7 +105,7 @@ import generate from "l10n-tool";
 
 const opts = {
   srcDir: "./src/",
-  destDir: "./locales",
+  destDir: "./locale",
 };
 
 generate(opts)
@@ -124,7 +113,7 @@ generate(opts)
   .catch((err) => console.error(err.message));
 ```
 
-The above will scan the files from `src`- directory and put the result to the `./locales`- directory.
+The above will scan the files from `src`- directory and put the result to the `./locale`- directory.
 
 ## Options structure
 
@@ -134,12 +123,9 @@ Options interface given to l10n tool function:
 interface Opts {
   srcDir: string;
   destDir: string;
-  classifyFile: (path: string) => string | undefined;
-  prefix: string;
   ts: boolean;
+  comments: boolean;
 }
 ```
 
 The function will receive partial of the Opts interface. Any field missing will be filled with the default value.
-
-`classifyFile` must return '\*' if file is in multi language format, string if there is a single language (defined by the returned string) or undefined if the file is not a language file.
