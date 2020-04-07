@@ -5,6 +5,7 @@
     "outDir": "./lib",
     "rootDir": "./src",
     "strict": true,
+    "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   }
